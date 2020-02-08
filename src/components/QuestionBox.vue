@@ -4,10 +4,20 @@
       <template v-slot:lead>{{currentQuestion.question}}</template>
 
       <hr class="my-4" />
+  <b-list-group>
+    <b-list-group-item 
+    v-for="(answer, index) in answers" 
+    :key="index"
+    @click="selectAnswer(index)"
+    :class="[selectedIndex === index ? 'selected' : '']"
+    >
+      {{answer}}
+    </b-list-group-item>
+</b-list-group>
 
-      <p v-for="(answer, index) in answers " :key="index">
+      <!-- <p v-for="(answer, index) in answers " :key="index">
        {{answer}}
-      </p>
+      </p> -->
 
       <b-button variant="primary" href="#">Submit</b-button>
       <b-button variant="success" href="#"  @click="next">Next</b-button>
@@ -16,10 +26,30 @@
 </template>
 
 <script>
+import _ from 'lodash'
 export default {
   props: {
     currentQuestion: Object,
     next: Function
+  },
+
+  data(){
+    return{
+    selectedIndex : null,
+    shuffledAnswers: []
+    }
+  },
+
+  methods:{
+ selectAnswer(index){
+  this.selectedIndex = index
+ },
+
+ shuffleAnswers(){
+  let answers = [...this.currentQuestion.incorrect_answers, this.currentQuestion.correct_answer]
+  this.shuffledAnswers = _.shuffle(answers)
+ }
+
   },
   computed:{
       answers() {
@@ -29,9 +59,36 @@ export default {
        
       }
   },
-  mounted(){
-    // eslint-disable-next-line no-console
+  watch:{
+   currentQuestion() {
+     this.selectedIndex = null
+     this.shuffleAnswers();
+   }
   }
 };
 </script>
 
+<style scoped>
+.list-group{
+  margin: 1rem;
+}
+
+.list-group-item:hover{
+  background: darkgray;
+  cursor: pointer;
+}
+
+.btn{
+  margin: 0 5px;
+}
+
+.selected {
+  background-color: lightblue;
+}
+.correct {
+  background-color: lightgreen;
+}
+.incorrect {
+  background-color: red;
+}
+</style>
